@@ -1,0 +1,5 @@
+2026-08-11T08:00:00Z INFO application started
+2026-08-11T08:00:01Z WARN retry scheduled for connector A
+2026-08-11T08:00:02Z ERROR timeout while reading synthetic provider
+2026-08-11T08:00:03Z ERROR timeout while reading synthetic provider
+2026-08-11T08:00:04Z INFO operator review required
