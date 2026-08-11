@@ -1,0 +1,69 @@
+{
+    "schemaVersion":  1,
+    "project":  "DebugForge Studio",
+    "version":  "1.0.0",
+    "approved":  true,
+    "reviewMode":  "automated-native-web-evidence",
+    "reviewedAt":  "2026-08-11T22:10:05.0578159+12:00",
+    "checks":  [
+                   "Release build passed",
+                   "deterministic scenarios passed 18/18",
+                   "streaming TextReader scan passed",
+                   "incident triage passed",
+                   "reproduction and hypothesis workflow passed",
+                   "file comparison passed",
+                   "native API smoke passed",
+                   "twelve native browser screenshots captured",
+                   "zero external writes"
+               ],
+    "screenshots":  [
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-01-log-intake-streaming-scan-and-incident-triage/01-desktop-overview.png",
+                            "sha256":  "5e1cfad90d840a9057dbae004373fd2bb7273155095cb87276dd7df9f3601817"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-01-log-intake-streaming-scan-and-incident-triage/02-desktop-workflow.png",
+                            "sha256":  "1f813f14dcbbb891dd2cfa6911ea68ef03e3ea680fb1058a8ec3ad73e24c4c66"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-01-log-intake-streaming-scan-and-incident-triage/03-desktop-review.png",
+                            "sha256":  "1baeb6a3cfcc7d56b235f1acd4eac564e765ab540e2fe64a7ab0f41f639aa572"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-01-log-intake-streaming-scan-and-incident-triage/04-mobile-workflow.png",
+                            "sha256":  "45b48ff050edd6d6ad779deef24b065c24877e22d3daf650e9f0f946ebafb629"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-02-reproduction-hypotheses-and-file-comparison/01-desktop-assurance.png",
+                            "sha256":  "0b03d37d1a13304c612be4b646a75d75302c3e77ae9ad419084ca937a66fe8df"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-02-reproduction-hypotheses-and-file-comparison/02-desktop-reporting.png",
+                            "sha256":  "ebf4060d101bf5c2bedeb4ccf0b4a6844776a09c391dc7d9c0f3a06c76ecc823"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-02-reproduction-hypotheses-and-file-comparison/03-desktop-boundaries.png",
+                            "sha256":  "8c612bf8fa774e50aa50106c3e3f4d6ff52ae83003640efaa0b58578192defa3"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-02-reproduction-hypotheses-and-file-comparison/04-mobile-assurance.png",
+                            "sha256":  "865c7596583df0b56725980c8300b3fd5f30a4c378048582bda2c79a9fc4e3d2"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-03-reports-evidence-export-and-product-boundaries/01-desktop-operations.png",
+                            "sha256":  "a114985a01d9226e469878be29eae17c8e5f1f6f402226007c823f13ad585652"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-03-reports-evidence-export-and-product-boundaries/02-desktop-evidence.png",
+                            "sha256":  "2e01e42062b2238892c3b78fcf08acbbd2a44c1ac97a0591462671b204f9eee0"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-03-reports-evidence-export-and-product-boundaries/03-desktop-release.png",
+                            "sha256":  "55157a1bb3e3a8d7b9847a4314160782d0a0f818e90484083445ff5caf31112f"
+                        },
+                        {
+                            "path":  "docs/screenshot-groups/screenshot-group-03-reports-evidence-export-and-product-boundaries/04-mobile-evidence.png",
+                            "sha256":  "159dae3b0ccc88b8086f677d35f8964b1e586251d604da300c421f7b96f22c4f"
+                        }
+                    ]
+}

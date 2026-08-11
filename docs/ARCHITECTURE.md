@@ -1,7 +1,9 @@
 # Architecture
 
-Stack: **.NET 8 / ASP.NET Core / C# 12**
+`DebugForgeStudio.Core` contains deterministic scan, triage, reproduction, hypothesis, comparison, and report logic.
 
-The repository separates domain logic, delivery/UI surfaces, synthetic fixtures, deterministic validation, and reviewer-facing evidence. The public boundary is deliberately synthetic and local-first.
+`DebugForgeStudio.Web` exposes minimal ASP.NET Core endpoints and serves the evidence UI.
 
-All logs, files, incidents, error signatures, reproduction steps, and reports are synthetic.
+`DebugForgeStudio.Tests` is an executable deterministic harness.
+
+No external system is called and no fix is automatically executed.

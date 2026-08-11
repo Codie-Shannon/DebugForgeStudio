@@ -1,26 +1,21 @@
 # DebugForge Studio
 
-> A structured debugging workspace for log analysis, incident triage, reproduction, file comparison, and evidence reports.
+A .NET 8 debugging and investigation workspace for synthetic log analysis, incident triage, reproduction, hypotheses, file comparison, and evidence export.
 
-**Status:** generated review baseline
-**Version:** `v0.1.0`
-**Stack:** .NET 8 / ASP.NET Core / C# 12
-**Evidence:** 3 screenshot groups / 12 generated review screenshots
+**Status:** native-validated public release (`v1.0.0`)
+**Evidence:** 3 screenshot groups / 12 native browser captures
 
-## Screenshot groups
+## Proof
 
-- **SG01:** Log Intake, Streaming Scan, and Incident Triage
-- **SG02:** Reproduction, Hypotheses, and File Comparison
-- **SG03:** Reports, Evidence Export, and Product Boundaries
+- collection and streaming log scan paths
+- normalized repeated-error signatures
+- explicit incident triage
+- ordered reproduction steps
+- evidence-backed hypotheses
+- working-vs-broken comparison
+- Markdown / JSON investigation exports
+- deterministic tests and native HTTP smoke
 
-## Portfolio proof
+## Boundary
 
-A structured debugging workspace for log analysis, incident triage, reproduction, file comparison, and evidence reports.
-
-## Data boundary
-
-All logs, files, incidents, error signatures, reproduction steps, and reports are synthetic.
-
-## Important limitation
-
-This is not yet the native/public closure. Generated screenshots and generated baseline verification are review artifacts; native runtime validation, final screenshots, GitHub Actions confirmation, and the `v1.0.0` release follow in the closure campaign.
+All logs, files, incidents, error signatures, reproduction steps, and reports are synthetic. DebugForge produces candidate evidence only; it does not execute fixes or write to external systems.

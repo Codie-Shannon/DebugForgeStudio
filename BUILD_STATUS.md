@@ -1,10 +1,11 @@
 # Build Status
 
-- Project: DebugForge Studio
-- Version: 0.1.0
-- Status: generated-review-baseline
-- Stack: .NET 8 / ASP.NET Core / C# 12
+DebugForge Studio v1.0.0 is native-validated.
+
+- .NET 8 Release build: passed
+- Deterministic scenarios: 18/18 passed
+- Native API smoke: passed
 - Screenshot groups: 3
-- Screenshots: 12
-- Native closure: pending
-- Public release approval: false
+- Native screenshots: 12
+- External writes: 0
+- GitHub Actions: cross-platform validation

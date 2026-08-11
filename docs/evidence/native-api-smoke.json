@@ -1,0 +1,90 @@
+{
+    "health":  {
+                   "status":  "Healthy",
+                   "project":  "DebugForge Studio",
+                   "version":  "1.0.0",
+                   "mode":  "Synthetic native portfolio environment"
+               },
+    "scan":  {
+                 "linesRead":  4,
+                 "findings":  [
+                                  {
+                                      "lineNumber":  2,
+                                      "severity":  "Warning",
+                                      "signature":  "WARN retry \u003cn\u003e",
+                                      "context":  "2026-08-11T08:00:00Z INFO start\r\n2026-08-11T08:00:01Z WARN retry 1\r\n2026-08-11T08:00:02Z ERROR timeout request 123",
+                                      "ruleId":  "LOG_WARNING"
+                                  },
+                                  {
+                                      "lineNumber":  3,
+                                      "severity":  "Error",
+                                      "signature":  "ERROR timeout request \u003cn\u003e",
+                                      "context":  "2026-08-11T08:00:01Z WARN retry 1\r\n2026-08-11T08:00:02Z ERROR timeout request 123\r\n2026-08-11T08:00:03Z ERROR timeout request 456",
+                                      "ruleId":  "LOG_ERROR"
+                                  },
+                                  {
+                                      "lineNumber":  4,
+                                      "severity":  "Error",
+                                      "signature":  "ERROR timeout request \u003cn\u003e",
+                                      "context":  "2026-08-11T08:00:02Z ERROR timeout request 123\r\n2026-08-11T08:00:03Z ERROR timeout request 456",
+                                      "ruleId":  "LOG_ERROR"
+                                  }
+                              ],
+                 "signatureCounts":  {
+                                         "WARN retry \u003cn\u003e":  1,
+                                         "ERROR timeout request \u003cn\u003e":  2
+                                     }
+             },
+    "triage":  {
+                   "state":  "Investigate",
+                   "errorCount":  2,
+                   "warningCount":  1,
+                   "repeatedSignatureCount":  1,
+                   "evidence":  [
+                                    "errors:2",
+                                    "warnings:1",
+                                    "repeatedSignatures:1",
+                                    "linesRead:4"
+                                ]
+               },
+    "reproduction":  {
+                         "value":  [
+                                       {
+                                           "order":  1,
+                                           "action":  "Open export",
+                                           "expected":  "Record observed result"
+                                       },
+                                       {
+                                           "order":  2,
+                                           "action":  "Run import",
+                                           "expected":  "Record observed result"
+                                       }
+                                   ],
+                         "Count":  2
+                     },
+    "hypothesis":  {
+                       "id":  "H1",
+                       "description":  "Delimiter mismatch",
+                       "state":  "Candidate",
+                       "evidence":  [
+                                        "header differs"
+                                    ]
+                   },
+    "comparison":  {
+                       "value":  [
+                                     {
+                                         "kind":  "ChangedLine",
+                                         "lineNumber":  1,
+                                         "working":  "id,status",
+                                         "broken":  "id;status"
+                                     },
+                                     {
+                                         "kind":  "MissingLine",
+                                         "lineNumber":  3,
+                                         "working":  "\u003cmissing\u003e",
+                                         "broken":  "2,Failed"
+                                     }
+                                 ],
+                       "Count":  2
+                   }
+}
