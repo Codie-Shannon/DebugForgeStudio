@@ -5,10 +5,15 @@
 **Status:** generated review baseline
 **Version:** `v0.1.0`
 **Stack:** .NET 8 / ASP.NET Core / C# 12
-**Official screenshot groups:** 3
-**Official screenshots:** 12
+**Evidence:** 3 screenshot groups / 12 generated review screenshots
 
-## Purpose
+## Screenshot groups
+
+- **SG01:** Log Intake, Streaming Scan, and Incident Triage
+- **SG02:** Reproduction, Hypotheses, and File Comparison
+- **SG03:** Reports, Evidence Export, and Product Boundaries
+
+## Portfolio proof
 
 A structured debugging workspace for log analysis, incident triage, reproduction, file comparison, and evidence reports.
 
@@ -16,6 +21,6 @@ A structured debugging workspace for log analysis, incident triage, reproduction
 
 All logs, files, incidents, error signatures, reproduction steps, and reports are synthetic.
 
-## Current status
+## Important limitation
 
-This repository is a generated, reviewable baseline. Native closure, real runtime capture, final CI proof, and the `v1.0.0` release are intentionally separate later steps.
+This is not yet the native/public closure. Generated screenshots and generated baseline verification are review artifacts; native runtime validation, final screenshots, GitHub Actions confirmation, and the `v1.0.0` release follow in the closure campaign.

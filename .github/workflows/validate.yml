@@ -1,0 +1,35 @@
+name: Validate DebugForge Studio
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore DebugForgeStudio.sln
+      - name: Release build
+        run: dotnet build DebugForgeStudio.sln --configuration Release --no-restore
+      - name: Deterministic tests
+        run: dotnet run --configuration Release --no-build --project tests/DebugForgeStudio.Tests/DebugForgeStudio.Tests.csproj
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Repository and evidence contract
+        run: python tools/verify_release.py
