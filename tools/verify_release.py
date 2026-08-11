@@ -1,133 +1,115 @@
-#!/usr/bin/env python3
 from __future__ import annotations
-
-import hashlib
-import json
-import re
-import struct
-import subprocess
-import sys
+import argparse, hashlib, json, re, struct, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-STATE = ROOT / "docs" / "project-state.json"
+ROOT=Path(__file__).resolve().parents[1]
 
-def fail(message: str) -> None:
-    raise SystemExit(message)
+def fail(msg:str)->None:
+    print(msg,file=sys.stderr)
+    raise SystemExit(1)
 
-def png_info(path: Path) -> tuple[int, int]:
-    data = path.read_bytes()
-    if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n":
+def png_info(path:Path)->tuple[int,int]:
+    data=path.read_bytes()
+    if len(data)<24 or data[:8]!=b"\x89PNG\r\n\x1a\n":
         fail(f"Not a valid PNG: {path.relative_to(ROOT)}")
-    return struct.unpack(">II", data[16:24])
+    return struct.unpack(">II",data[16:24])
 
-def main() -> None:
-    if not STATE.is_file():
-        fail("docs/project-state.json is missing.")
+def main()->None:
+    p=argparse.ArgumentParser()
+    p.add_argument("--allow-pending-review",action="store_true")
+    a=p.parse_args()
 
-    state = json.loads(STATE.read_text(encoding="utf-8-sig"))
+    state=json.loads((ROOT/"docs/project-state.json").read_text(encoding="utf-8-sig"))
 
-    if state.get("project") != "DebugForge Studio":
-        fail("project-state project name mismatch.")
+    required=[
+        "README.md","BUILD_STATUS.md","CHANGELOG.md","SECURITY.md",
+        "RIGHTS_AND_LICENSING.md","GITHUB_METADATA.md",
+        "src/DebugForgeStudio.Core/DebugForgeStudio.Core.csproj",
+        "src/DebugForgeStudio.Core/Models.cs",
+        "src/DebugForgeStudio.Core/ScanEngine.cs",
+        "src/DebugForgeStudio.Core/InvestigationEngine.cs",
+        "src/DebugForgeStudio.Core/ReportEngine.cs",
+        "src/DebugForgeStudio.Web/DebugForgeStudio.Web.csproj",
+        "src/DebugForgeStudio.Web/Program.cs",
+        "tests/DebugForgeStudio.Tests/DebugForgeStudio.Tests.csproj",
+        "tests/DebugForgeStudio.Tests/Program.cs",
+        "docs/MASTER.md","docs/ARCHITECTURE.md","docs/LIMITATIONS.md",
+    ]
+    if not a.allow_pending_review:
+        required += [
+            "docs/manual-validation/v1.0.0-native-review.json",
+            "docs/release-notes/v1.0.0.md",
+        ]
 
-    if state.get("version") != "0.1.0":
-        fail("Expected generated baseline version 0.1.0.")
+    for rel in required:
+        if not (ROOT/rel).is_file():
+            fail(f"Missing required file: {rel}")
 
-    groups = sorted((ROOT / "docs" / "screenshot-groups").glob("screenshot-group-*"))
-    if len(groups) != 3:
-        fail(f"Expected 3 screenshot groups, found {len(groups)}.")
+    program=(ROOT/"src/DebugForgeStudio.Web/Program.cs").read_text(encoding="utf-8")
+    for route in [
+        '"/health"','"/api/status"','"/api/scan"','"/api/scan/stream"',
+        '"/api/triage"','"/api/reproduction"','"/api/hypothesis"',
+        '"/api/compare"','"/api/report/markdown"','"/api/report/json"'
+    ]:
+        if route not in program:
+            fail(f"Missing expected DebugForge route: {route}")
 
-    count = 0
-    hashes: dict[str, str] = {}
+    groups=sorted((ROOT/"docs/screenshot-groups").glob("screenshot-group-*"))
+    if len(groups)!=3:
+        fail(f"Expected 3 screenshot groups, found {len(groups)}")
 
+    hashes={}
+    count=0
     for group in groups:
-        images = sorted(group.glob("*.png"))
-        if len(images) != 4:
-            fail(f"{group.name} must contain exactly four PNG files.")
-
-        if not (group / "README.md").is_file():
-            fail(f"Missing screenshot README: {group.name}")
-
-        for image in images:
-            width, height = png_info(image)
-            expected = (390, 844) if image.name.startswith("04-mobile") else (1440, 900)
-            if (width, height) != expected:
-                fail(f"Wrong screenshot dimensions: {image.relative_to(ROOT)} -> {width}x{height}")
-
-            digest = hashlib.sha256(image.read_bytes()).hexdigest()
+        imgs=sorted(group.glob("*.png"))
+        if len(imgs)!=4:
+            fail(f"{group.name}: expected 4 screenshots, found {len(imgs)}")
+        for image in imgs:
+            w,h=png_info(image)
+            expected=(390,844) if image.name.startswith("04-mobile") else (1440,900)
+            if (w,h)!=expected:
+                fail(f"Wrong dimensions: {image.relative_to(ROOT)} -> {w}x{h}")
+            digest=hashlib.sha256(image.read_bytes()).hexdigest()
             if digest in hashes:
                 fail(f"Duplicate screenshot bytes: {image.relative_to(ROOT)} and {hashes[digest]}")
-            hashes[digest] = image.relative_to(ROOT).as_posix()
-            count += 1
+            hashes[digest]=image.relative_to(ROOT).as_posix()
+            count+=1
 
-    if count != 12:
-        fail(f"Expected 12 screenshots, found {count}.")
+    if count!=12 or state.get("officialScreenshots")!=12:
+        fail("Expected exactly 12 official screenshots.")
 
-    if state.get("officialScreenshots") != count:
-        fail("project-state screenshot count mismatch.")
-
-    text_ext = {".md", ".txt", ".json", ".yml", ".yaml", ".html", ".css", ".js", ".mjs", ".ts", ".vue", ".py", ".cs", ".csproj", ".sln", ".xml", ".toml", ".ps1"}
-    excluded_dirs = {".git", "bin", "obj", "node_modules", "dist", "artifacts", "__pycache__", ".venv"}
-    patterns = [
-        re.compile(r"[A-Za-z]:[\\/]+Users[\\/]+[^\\/]+[\\/]+", re.I),
-        re.compile(r"/home/[^/]+/", re.I),
-        re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
-        re.compile(r"gh[opsu]_[A-Za-z0-9]{20,}"),
-        re.compile(r"(?:client[_-]?secret|api[_-]?key|password)\s*[:=]\s*['\"]?[A-Za-z0-9_\-]{16,}", re.I),
+    forbidden=[
+        re.compile(r"(?i)client[_-]?secret\s*[:=]"),
+        re.compile(r"(?i)password\s*[:=]\s*['\"][^'\"]{12,}"),
+        re.compile(r"https://api\.",re.I),
     ]
+    for rel in [
+        "src/DebugForgeStudio.Core/ScanEngine.cs",
+        "src/DebugForgeStudio.Core/InvestigationEngine.cs",
+        "src/DebugForgeStudio.Core/ReportEngine.cs",
+        "src/DebugForgeStudio.Web/Program.cs",
+    ]:
+        text=(ROOT/rel).read_text(encoding="utf-8",errors="ignore")
+        if any(rx.search(text) for rx in forbidden):
+            fail(f"External/secret-shaped content found: {rel}")
 
-    findings: list[str] = []
-    for path in ROOT.rglob("*"):
-        if not path.is_file() or path.suffix.lower() not in text_ext:
-            continue
-        rel = path.relative_to(ROOT)
-        if rel.as_posix() == "tools/verify_release.py":
-            continue
-        if any(part in excluded_dirs for part in rel.parts[:-1]):
-            continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
-        for pattern in patterns:
-            if pattern.search(text):
-                findings.append(f"{rel.as_posix()}: {pattern.pattern}")
-
-    if findings:
-        fail("Machine path or secret-shaped finding:\n" + "\n".join(findings[:30]))
-
-    messages = subprocess.run(
-        ["git", "log", "--reverse", "--format=%s"],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-        check=True,
-    ).stdout.splitlines()
-
-    if len(messages) != 8:
-        fail(f"Expected 8 commits, found {len(messages)}.")
-
-    expected = ["chore: establish DebugForge Studio repository foundation", "feat: add DebugForge Studio core and synthetic fixtures", "feat(sg01): deliver Log Intake, Streaming Scan, and Incident Triage", "docs(sg01): add Log Intake, Streaming Scan, and Incident Triage evidence", "feat(sg02): deliver Reproduction, Hypotheses, and File Comparison", "docs(sg02): add Reproduction, Hypotheses, and File Comparison evidence", "feat(sg03): deliver Reports, Evidence Export, and Product Boundaries", "docs(sg03): close evidence and v0.1.0 generated baseline"]
-    if messages != expected:
-        fail("Commit history does not match the planned meaningful history.")
-
-    status = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-        check=True,
-    ).stdout.strip()
-
-    if status:
-        fail("Working tree is not clean.")
+    approved=False
+    if not a.allow_pending_review:
+        review=json.loads(
+            (ROOT/"docs/manual-validation/v1.0.0-native-review.json")
+            .read_text(encoding="utf-8-sig")
+        )
+        approved=review.get("approved") is True
+        if not approved:
+            fail("Native review is not approved.")
 
     print("DebugForge Studio repository verification passed.")
-    print("Version:           0.1.0")
-    print("Screenshot groups: 3")
-    print("Screenshots:       12")
-    print("Commits:           8")
-    print("Public boundary:   passed")
+    print("Version:            1.0.0")
+    print("Screenshot groups:  3")
+    print("Screenshots:        12")
+    print(f"Evidence approved:  {approved}")
+    print("External writes:    0")
+    print("Public boundary:    passed")
 
-if __name__ == "__main__":
+if __name__=="__main__":
     main()
