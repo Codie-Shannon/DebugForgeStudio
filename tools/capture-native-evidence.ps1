@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) { throw 'DebugForge web build failed.' }
 $Process=Start-Process `
     -FilePath 'dotnet' `
     -ArgumentList @($Dll,'--urls',$BaseUrl) `
-    -WorkingDirectory (Split-Path $Dll -Parent) `
+    -WorkingDirectory (Join-Path $RepoRoot 'src\DebugForgeStudio.Web') `
     -RedirectStandardOutput $Out `
     -RedirectStandardError $Err `
     -PassThru
@@ -106,6 +106,16 @@ try {
             $Dir=Join-Path $Root $Spec.Group
             New-Item -ItemType Directory -Force -Path $Dir|Out-Null
             $Output=Join-Path $Dir $Spec.File
+            $CaptureUrl="$BaseUrl/$($Spec.Page)"
+
+            try { $Route=Invoke-WebRequest -Uri $CaptureUrl -UseBasicParsing -TimeoutSec 10 }
+            catch { throw "Evidence route preflight failed for ${CaptureUrl}: $($_.Exception.Message)" }
+            if ($Route.StatusCode -lt 200 -or $Route.StatusCode -ge 300 -or [string]::IsNullOrWhiteSpace($Route.Content)) {
+                throw "Evidence route preflight returned an invalid response for $CaptureUrl"
+            }
+            if ($Route.Content -match '(?i)404|Not Found|page could not be found|Cannot GET|ERR_CONNECTION') {
+                throw "Evidence route preflight found error-page content for $CaptureUrl"
+            }
             Remove-Item -LiteralPath $Output -Force -ErrorAction SilentlyContinue
 
             $Args=@(
@@ -113,7 +123,7 @@ try {
                 "--user-data-dir=$Profile",
                 "--window-size=$($Spec.Size)",
                 "--screenshot=$Output",
-                "$BaseUrl/$($Spec.Page)"
+                $CaptureUrl
             )
 
             $Cap=Start-Process -FilePath $Browser -ArgumentList $Args -Wait -PassThru
